@@ -6,17 +6,82 @@
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
   </head>
   <body>
-    <!-- <a-scene mindar-image="imageTargetSrc: https://ariestellar.github.io/ARSpaceDay/targets.mind;" color-space="sRGB" renderer="colorManagement: true, physicallyCorrectLights" vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false"></a-scene> -->
-    <a-scene mindar-image="imageTargetSrc: ./targets.mind;" color-space="sRGB" renderer="colorManagement: true, physicallyCorrectLights" vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">    
+    <a-scene 
+      mindar-image="imageTargetSrc: ./targets.mind;" 
+      color-space="sRGB" 
+      renderer="colorManagement: true, physicallyCorrectLights" 
+      vr-mode-ui="enabled: false" 
+      device-orientation-permission-ui="enabled: false"
+      id="scene">
+      
       <a-assets>
-        <!-- <a-asset-item id="avatarModel" src="https://ariestellar.github.io/ARSpaceDay/Scenes/Rocket.gltf"></a-asset-item> -->
-        <a-asset-item id="avatarModel" src="./Scenes/Rocket.gltf"></a-asset-item>
+        <a-asset-item id="avatarModel" src="./Scenes/Rocket.glb"></a-asset-item>
       </a-assets>
-
       <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
-      <a-entity mindar-image-target="targetIndex: 0">
-        <a-gltf-model rotation="90 0 0 " position="0 0 0" scale="1 1 1" src="#avatarModel" animation-mixer>
+      <a-entity mindar-image-target="targetIndex: 0" id="target">
+        <a-gltf-model id="rocket" rotation="90 0 0" position="0 0 0" scale="1 1 1" src="#avatarModel"> </a-gltf-model>
       </a-entity>
     </a-scene>
+
+    <script>
+      let clock = new THREE.Clock();
+      let mixer = null;
+      let rocketObject = null;
+
+      document.addEventListener("DOMContentLoaded", () => {
+        const target = document.querySelector("#target");
+        const rocket = document.querySelector("#rocket");
+
+        rocket.addEventListener("model-loaded", () => {
+          console.log("The model is loaded!");
+          rocketObject = rocket.getObject3D("mesh");
+          mixer = new THREE.AnimationMixer(rocketObject);
+          let clips = rocketObject.animations;
+
+          if (clips.length > 0) {
+            let action = mixer.clipAction(clips[0]);
+            action.play();
+            console.log("Play Animation: ", clips[0].name);
+          } else {
+            console.log("Animation not found");
+          }
+        });
+
+        target.addEventListener("targetFound", () => {
+          console.log("The target has been found! Starting the animation.");
+          if (mixer) {
+            let clips = rocketObject.animations;
+            if (clips.length > 0) {
+              let action = mixer.clipAction(clips[0]);
+              action.play();
+            }
+          }
+        });
+
+        target.addEventListener("targetLost", () => {
+          console.log("The target is lost! Stop the animation.");
+          if (mixer) {
+            mixer.stopAllAction();  // Останавливаем все действия
+          }
+        });
+      });
+
+      function animate() {
+        requestAnimationFrame(animate);
+
+        // Используем систему рендеринга A-Frame для рендеринга сцены
+        const scene = document.querySelector('a-scene');
+        if (scene && scene.hasLoaded) {
+          scene.render();
+        }
+
+        if (mixer) {
+          let delta = clock.getDelta();
+          mixer.update(delta);
+        }
+      }
+
+      animate();
+    </script>
   </body>
 </html>
