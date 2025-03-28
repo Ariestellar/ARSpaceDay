@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <script src="./libs/aframe.min.js"></script>
     <script src="./libs/mindar-image-aframe.prod.js"></script>
@@ -32,10 +33,26 @@
             transition: opacity 1s ease-in-out;
             z-index: 100;
         }
+        #redButton {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 100px;
+            background: red;
+            border: 5px solid white;
+            border-radius: 50%;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+            z-index: 10;
+            display: none;
+        }
     </style>
   </head>
   <body>
     <div id="fade"></div>
+    <button id="redButton">Поехали!</button>
     <button id="switchButton">In 360</button>
     <a-scene 
       mindar-image="imageTargetSrc: ./targets.mind;" 
@@ -52,11 +69,24 @@
         <a-gltf-model id="rocket" rotation="0 0 0" position="0 0 0" scale="1 1 1" src="#avatarModel"> </a-gltf-model>
       </a-entity>
     </a-scene>
-
+    <audio id="bgSound" loop autoplay>
+      <source src="BGSound.mp3" type="audio/mp3">
+      Ваш браузер не поддерживает элемент audio.
+    </audio>
+    <audio id="startRocketSound">
+      <source src="StartRocket.mp3" type="audio/mp3">
+      Ваш браузер не поддерживает элемент audio.
+    </audio>
     <script>
       let clock = new THREE.Clock();
       let mixer = null;
       let rocketObject = null;
+      let fade = document.getElementById('fade');
+      let switchButton = document.getElementById("switchButton");
+      let redButton = document.getElementById("redButton");
+      let rocketAnim;
+      let bgSound;
+      let isStart = false;
 
       document.addEventListener("DOMContentLoaded", () => {
         const target = document.querySelector("#target");
@@ -68,21 +98,17 @@
           mixer = new THREE.AnimationMixer(rocketObject);
           let clips = rocketObject.animations;
 
+          bgSound = document.getElementById("bgSound");
+          bgSound.volume = 0.2;
+          bgSound.play();
+
           if (clips.length > 0) {
             let Earth = mixer.clipAction(clips[0]);
             let Letters = mixer.clipAction(clips[1]);
-            let Rocket = mixer.clipAction(clips[2]);
-
-            //Earth
-            //Letters
-            //Rocket1
+            rocketAnim = mixer.clipAction(clips[2]);
+            rocketAnim.setLoop(THREE.LoopOnce);
             Earth.play();
             Letters.play();
-            Rocket.play();
-
-            console.log("Play Animation: ", clips[0].name);
-            console.log("Play Animation: ", clips[1].name);
-            console.log("Play Animation: ", clips[2].name);
           } else {
             console.log("Animation not found");
           }
@@ -92,30 +118,35 @@
 
         target.addEventListener("targetFound", () => {
           console.log("The target has been found! Starting the animation.");
-          if (mixer) {
-            let clips = rocketObject.animations;
-            if (clips.length > 0) {
-              let action = mixer.clipAction(clips[0]);
-              action.play();
-            }
-          }
+          if(isStart == false) redButton.style.display = "block";
         });
 
         target.addEventListener("targetLost", () => {
           console.log("The target is lost! Stop the animation.");
-          if (mixer) {
-            //mixer.stopAllAction();
-          }
+          redButton.style.display = "none";
         });
-      });
-
-      let fade = document.getElementById('fade');
-      let switchButton = document.getElementById("switchButton");
+      });     
 
       switchButton.addEventListener("click", () => {
           fade.style.opacity = 1;
           setTimeout(() => { window.location.href = 'https://ariestellar.github.io/ARSpaceDay360.github.io/';}, 1000);
       });
+
+      redButton.addEventListener("click", () => {
+        isStart = true;
+        redButton.style.display = "none";
+        let startRocketSound = document.getElementById("startRocketSound");
+        bgSound.volume = 0;
+        startRocketSound.volume = 0.5;
+        startRocketSound.play();
+        setTimeout(() => { rocketAnim.play();}, 3000);
+        setTimeout(go, 15000);
+      });
+
+      function go() {
+        fade.style.opacity = 1;
+        setTimeout(() => { window.location.href = 'https://ariestellar.github.io/ARSpaceDay360.github.io/';}, 1000);
+      }
 
       function animate() {
         requestAnimationFrame(animate);
