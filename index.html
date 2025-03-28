@@ -45,11 +45,11 @@
       device-orientation-permission-ui="enabled: false"
       id="scene">      
       <a-assets>
-        <a-asset-item id="avatarModel" src="./Scenes/Rocket.glb"></a-asset-item>
+        <a-asset-item id="avatarModel" src="./Scenes/Cosmo.glb"></a-asset-item>
       </a-assets>
       <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
       <a-entity mindar-image-target="targetIndex: 0" id="target">
-        <a-gltf-model id="rocket" rotation="90 0 0" position="0 0 0" scale="1 1 1" src="#avatarModel"> </a-gltf-model>
+        <a-gltf-model id="rocket" rotation="0 0 0" position="0 0 0" scale="0.5 0.5 0.5 " src="#avatarModel"> </a-gltf-model>
       </a-entity>
     </a-scene>
 
@@ -69,9 +69,20 @@
           let clips = rocketObject.animations;
 
           if (clips.length > 0) {
-            let action = mixer.clipAction(clips[0]);
-            action.play();
+            let Earth = mixer.clipAction(clips[0]);
+            let Letters = mixer.clipAction(clips[1]);
+            let Rocket = mixer.clipAction(clips[3]);
+
+            //Earth
+            //Letters
+            //Rocket1
+            Earth.play();
+            Letters.play();
+            Rocket.play();
+
             console.log("Play Animation: ", clips[0].name);
+            console.log("Play Animation: ", clips[1].name);
+            console.log("Play Animation: ", clips[3].name);
           } else {
             console.log("Animation not found");
           }
@@ -117,7 +128,6 @@
           mixer.update(delta);
         }
       }
-
       animate();
     </script>
   </body>
