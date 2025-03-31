@@ -90,14 +90,13 @@
       let rocketObject = null;
       let fade = document.getElementById('fade');
       let redButton = document.getElementById("redButton");
+      let bgSound = document.getElementById("bgSound");
       redButton.style.display = 'none';
       let rocketAnim;
-      let bgSound;
       let isStart = false;
 
       soundButton.addEventListener("click", () => {
         soundButton.style.display = 'none';
-        bgSound = document.getElementById("bgSound");
         bgSound.volume = 0.2;
         bgSound.play();
       });
