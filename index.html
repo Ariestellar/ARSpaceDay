@@ -33,36 +33,36 @@
             z-index: 100;
         }
         #redButton {
-            position: absolute;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 100px;
-            height: 100px;
-            background: rgb(241, 88, 88);
-            border: 5px solid white;
-            border-radius: 50%;
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
-            cursor: pointer;
-            z-index: 10;
-            display: none;
-
-            color: white; 
-            font-weight: bold;
-            font-size: 14px;
-            text-align: center;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+          position: absolute;
+          bottom: 20px;
+          left: 50%;
+          transform: translateX(-50%);
+          width: 100px;
+          height: 100px;
+          background: rgb(241, 88, 88);
+          border: 5px solid white;
+          border-radius: 50%;
+          box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
+          cursor: pointer;
+          z-index: 10;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          
+          color: white; 
+          font-weight: bold;
+          font-size: 1rem; /* Заменить пиксели на rem */
+          text-align: center;
+      }
     </style>
   </head>
   <body>
     <div id="fade"></div>
-    <button id="redButton">ПОЕХАЛИ!</button>
+    <button id="redButton">ПОЕХАЛИ</button>
     <button id="soundButton">Включить звук</button>
     <a-scene 
-      mindar-image="imageTargetSrc: ./targets.mind;" 
+      mindar-image="imageTargetSrc: ./targets.mind;"
+      mindar-image="warmupTolerance: 50; missTolerance: 100; filterMinCF: 0.001; filterBeta: 0.01"
       color-space="sRGB" 
       renderer="colorManagement: true, physicallyCorrectLights" 
       vr-mode-ui="enabled: false" 
@@ -84,6 +84,7 @@
       <source src="StartRocket.mp3" type="audio/mp3">
       Ваш браузер не поддерживает элемент audio.
     </audio>
+    
     <script>
       let clock = new THREE.Clock();
       let mixer = null;
@@ -153,7 +154,7 @@
         setTimeout(() => { window.location.href = 'https://ariestellar.github.io/ARSpaceDay360.github.io/';}, 1000);
       }
 
-      function animate() {
+      /*function animate() {
         requestAnimationFrame(animate);
         const scene = document.querySelector('a-scene');
         if (scene && scene.hasLoaded) {
@@ -163,7 +164,17 @@
           let delta = clock.getDelta();
           mixer.update(delta);
         }
+      }*/
+
+      function animate() { 
+        requestAnimationFrame(animate);
+
+        if (mixer) {
+          let delta = Math.min(clock.getDelta(), 0.1); // Ограничение для стабильности
+          mixer.update(delta);
+        }
       }
+
       animate();
     </script>
   </body>
